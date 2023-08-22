@@ -10,17 +10,25 @@ import Foundation
 struct PageItem {
     var id: Int
     var title: String
-    var voteAverage: Double
-    var budget: Int
-    var revenue: Int
+    var voteAverage: String
+    var budget: String
+    var revenue: String
     var imageURL: URL?
     
-    init(id: Int, title: String, voteAverage: Double, budget: Int, revenue: Int, imageURL: URL?) {
+    init(id: Int, title: String, voteAverage: Double, budget: Int?, revenue: Int?, imageURL: URL?) {
         self.id = id
         self.title = title
-        self.voteAverage = voteAverage
-        self.budget = budget
-        self.revenue = revenue
+        self.voteAverage = "\(voteAverage)"
+        if let budget = budget {
+            self.budget = "\(budget)"
+        } else {
+            self.budget = "-"
+        }
+        if let revenue = revenue {
+            self.revenue = "\(revenue)"
+        } else {
+            self.revenue = "-"
+        }
         self.imageURL = imageURL
     }
 }

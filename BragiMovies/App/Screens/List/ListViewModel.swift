@@ -13,15 +13,17 @@ protocol ListViewModelProtocol {
     var title: String { get }
     var type: MediaType { get }
     
-    var genres: BehaviorRelay<[Genre]> { get }
-    var selectedGenre: BehaviorRelay<Genre?> { get }
-    var loadingState: BehaviorRelay<ListState> { get }
+    var genres: [Genre] { get }
+    var selectedGenre: Int? { get }
 
     var listCount: Int { get }
     var list: [PageItem] { get }
 
+    var state: BehaviorRelay<ListState> { get }
+
     func loadGenres()
     func didSelect(genreAt index: Int)
+    func isGenreSelected(at index: Int) -> Bool
     
     func loadPage(for genreID: Int, page: Int)
     func preloadIfNeeded(for index: Int)
@@ -29,6 +31,8 @@ protocol ListViewModelProtocol {
 
 enum ListState {
     case empty
+    case finishedLoadingGenres
+    case genreChange(from: Int?, to: Int?)
     case loading(page: Int)
     case loaded(page: Page)
 }
@@ -40,9 +44,11 @@ class ListViewModel: ListViewModelProtocol {
     let title: String
     let type: MediaType
     let tmdbUseCase: TMDBUseCaseProtocol
-    let genres: BehaviorRelay<[Genre]> = BehaviorRelay<[Genre]>(value: [])
-    let selectedGenre: BehaviorRelay<Genre?> = BehaviorRelay<Genre?>(value: nil)
-    let loadingState: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .empty)
+
+    let state: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .empty)
+
+    var genres: [Genre] = []
+    var selectedGenre: Int? = nil
     
     var pages: [Page] = []
     var listCount: Int {
@@ -69,21 +75,20 @@ class ListViewModel: ListViewModelProtocol {
     }
     
     // MARK: -
-
+    
     func loadGenres() {
         tmdbUseCase.listGenres(for: type)
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] items in
-                self?.genres.accept(items)
-                if self?.selectedGenre.value == nil {
-                    self?.selectedGenre.accept(items.first)
-                }
-            }
+            .subscribe(onSuccess: { [weak self] items in
+                self?.genres = items
+                self?.selectedGenre = .zero
+                self?.state.accept(.finishedLoadingGenres)
+            })
             .disposed(by: bag)
     }
-    
+
     func loadPage(for genreID: Int, page: Int) {
-        loadingState.accept(.loading(page: page))
+        state.accept(.loading(page: page))
         switch type {
         case .movie:
             loadMovies(for: genreID, page: page)
@@ -133,7 +138,7 @@ class ListViewModel: ListViewModelProtocol {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] page in
                 self?.pages.append(page)
-                self?.loadingState.accept(.loaded(page: page))
+                self?.state.accept(.loaded(page: page))
             })
             .disposed(by: bag)
     }
@@ -141,7 +146,7 @@ class ListViewModel: ListViewModelProtocol {
     func preloadIfNeeded(for index: Int) {
         let displayedPage = (index / Page.defaultSize)
         let pageToLoad = displayedPage + 2
-        if case .loading(let pageInLoading) = loadingState.value {
+        if case .loading(let pageInLoading) = state.value {
             if pageInLoading <= pageToLoad {
                 return
             }
@@ -154,21 +159,30 @@ class ListViewModel: ListViewModelProtocol {
         guard rate > 0.75 else {
             return
         }
-        if let genre = selectedGenre.value {
-            loadPage(for: genre.id, page: pageToLoad)
+        if let index = selectedGenre, genres.count > index {
+            loadPage(for: genres[index].id, page: pageToLoad)
         }
     }
     
     func didSelect(genreAt index: Int) {
-        guard genres.value.count > index else {
+        guard genres.count > index else {
             return
         }
         resetMediaList()
-        selectedGenre.accept(genres.value[index])
+        let oldSelectionIndex = selectedGenre
+        selectedGenre = index
+        state.accept(.genreChange(from: oldSelectionIndex, to: index))
+    }
+    
+    func isGenreSelected(at index: Int) -> Bool {
+        guard let selectedGenreIndex = selectedGenre, genres.count > index else {
+            return false
+        }
+        return genres[selectedGenreIndex] == genres[index]
     }
     
     private func resetMediaList() {
         pages = []
-        loadingState.accept(.empty)
+        state.accept(.empty)
     }
 }

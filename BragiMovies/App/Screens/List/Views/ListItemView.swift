@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RxCocoa
 import Kingfisher
 
 class ListItemView: UICollectionViewCell {
@@ -70,6 +69,7 @@ class ListItemView: UICollectionViewCell {
     
     private func setupUI() {
         backgroundColor = .white
+        contentView.clipsToBounds = true
         addSubview(image)
 
         addSubview(title)
@@ -78,38 +78,37 @@ class ListItemView: UICollectionViewCell {
         addSubview(revenue)
 
         NSLayoutConstraint.activate([
-            image.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Dimensions.sizeM),
+            image.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Dimensions.sizeS),
             image.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6),
             image.heightAnchor.constraint(equalTo: image.widthAnchor, multiplier: 0.5),
             image.centerXAnchor.constraint(equalTo: centerXAnchor),
 
-            title.topAnchor.constraint(equalTo: image.bottomAnchor, constant: Dimensions.sizeS),
+            title.topAnchor.constraint(greaterThanOrEqualTo: image.bottomAnchor, constant: Dimensions.sizeXS),
             title.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             title.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            rating.topAnchor.constraint(equalTo: title.bottomAnchor, constant: Dimensions.sizeS),
+            rating.topAnchor.constraint(greaterThanOrEqualTo: title.bottomAnchor, constant: Dimensions.sizeXS),
             rating.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             rating.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            budget.topAnchor.constraint(equalTo: rating.bottomAnchor, constant: Dimensions.sizeS),
+            budget.topAnchor.constraint(greaterThanOrEqualTo: rating.bottomAnchor, constant: Dimensions.sizeXS),
             budget.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             budget.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            revenue.topAnchor.constraint(equalTo: budget.bottomAnchor, constant: Dimensions.sizeS),
+            revenue.topAnchor.constraint(greaterThanOrEqualTo: budget.bottomAnchor, constant: Dimensions.sizeXS),
             revenue.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             revenue.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            revenue.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
         ])
     }
     
-    func configure(with media: PageItem) {
-        title.value.text = media.title
-        rating.value.text = "\(media.voteAverage)"
-        budget.value.text = "\(media.budget ?? .zero)"
-        revenue.value.text = "\(media.revenue ?? .zero)"
+    func configure(with item: PageItem) {
+        title.value.text = item.title
+        rating.value.text = item.voteAverage
+        budget.value.text = item.budget
+        revenue.value.text = item.revenue
         
         image.kf.setImage(
-            with: media.imageURL,
+            with: item.imageURL,
                 options: [
                     .loadDiskFileSynchronously,
                     .cacheOriginalImage,
