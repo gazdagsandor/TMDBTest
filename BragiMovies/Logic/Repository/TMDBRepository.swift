@@ -73,5 +73,3 @@ class TMDBRepository: TMDBRepositoryProtocol {
     }
     
 }
-
-//    Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ZjU0YWQxZWE0ZmI0YzVmMDczMjFjZDUyZDJmMzBlMCIsInN1YiI6IjU4OWNjNjg3YzNhMzY4MTE1ODAwMTc0MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-vWmnNb68dUwPtyzuGsQzszxj1nshCDJvMf0EBqOaZk

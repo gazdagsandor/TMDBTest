@@ -69,7 +69,7 @@ class ListItemView: UICollectionViewCell {
     // MARK: -
     
     private func setupUI() {
-        backgroundColor = .yellow
+        backgroundColor = .white
         addSubview(image)
 
         addSubview(title)
