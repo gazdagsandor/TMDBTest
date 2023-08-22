@@ -29,14 +29,6 @@ protocol ListViewModelProtocol {
     func preloadIfNeeded(for index: Int)
 }
 
-enum ListState {
-    case empty
-    case finishedLoadingGenres
-    case genreChange(from: Int?, to: Int?)
-    case loading(page: Int)
-    case loaded(page: Page)
-}
-
 class ListViewModel: ListViewModelProtocol {
     
     // MARK: -

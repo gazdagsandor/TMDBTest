@@ -45,6 +45,7 @@
 		B62707DF2A94D61E00AF5175 /* CoordinatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62707DE2A94D61E00AF5175 /* CoordinatorProtocol.swift */; };
 		B62707E22A94DAE300AF5175 /* Dimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62707E12A94DAE300AF5175 /* Dimensions.swift */; };
 		B62707E42A94EDB600AF5175 /* Genre+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62707E32A94EDB600AF5175 /* Genre+Extensions.swift */; };
+		B62F72A12A95500F00BCF126 /* ListState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62F72A02A95500F00BCF126 /* ListState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +90,7 @@
 		B62707DE2A94D61E00AF5175 /* CoordinatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorProtocol.swift; sourceTree = "<group>"; };
 		B62707E12A94DAE300AF5175 /* Dimensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dimensions.swift; sourceTree = "<group>"; };
 		B62707E32A94EDB600AF5175 /* Genre+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Genre+Extensions.swift"; sourceTree = "<group>"; };
+		B62F72A02A95500F00BCF126 /* ListState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListState.swift; sourceTree = "<group>"; };
 		FCAF3FBDF3A61A4AC7A699AB /* Pods-BragiMovies.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BragiMovies.release.xcconfig"; path = "Target Support Files/Pods-BragiMovies/Pods-BragiMovies.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -279,10 +281,11 @@
 		B62707D42A94B72B00AF5175 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				B62707E32A94EDB600AF5175 /* Genre+Extensions.swift */,
+				B62F72A02A95500F00BCF126 /* ListState.swift */,
 				B62707D52A94B74900AF5175 /* Page.swift */,
 				B62707D92A94C12400AF5175 /* PageItem.swift */,
 				B62707DB2A94C13A00AF5175 /* PageItemConvertible.swift */,
-				B62707E32A94EDB600AF5175 /* Genre+Extensions.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				B61624AD2A935CF300522659 /* ListViewController.swift in Sources */,
 				B62707DA2A94C12400AF5175 /* PageItem.swift in Sources */,
 				B61624AF2A935D8800522659 /* MainView+Assembly.swift in Sources */,
+				B62F72A12A95500F00BCF126 /* ListState.swift in Sources */,
 				B61624B92A93653800522659 /* ListPage.swift in Sources */,
 				B62707E42A94EDB600AF5175 /* Genre+Extensions.swift in Sources */,
 				B61624B72A93630A00522659 /* ListViewModel.swift in Sources */,
