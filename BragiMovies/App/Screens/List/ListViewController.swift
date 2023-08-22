@@ -10,6 +10,11 @@ import RxSwift
 
 class ListViewController: UIViewController {
     
+    private struct Constants {
+        static let itemCellHeight = 160.0
+        static let estimatedGenreCellWidth = 300.0
+    }
+    
     // MARK: -
     
     lazy var genresView: GenresView = {
@@ -54,7 +59,6 @@ class ListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         viewModel.loadGenres()
     }
     
@@ -85,29 +89,37 @@ class ListViewController: UIViewController {
     }
     
     func setupBindings() {
-        
-        viewModel.genres.subscribe { [weak self] _ in
-            self?.genresView.reloadData()
-        }
-        .disposed(by: bag)
-        
-        viewModel.selectedGenre.subscribe { [weak self] genre in
-            guard let genre = genre else { return }
-            self?.viewModel.loadPage(for: genre.id, page: 1)
-        }
-        .disposed(by: bag)
-        
-        viewModel.loadingState.subscribe { [weak self] state in
-            switch state {
-            case .empty:
-                self?.listView.reloadData()
-            case .loading: // TODO: add loading indicator here
-                break
-            case .loaded(let page):
-                self?.listView.insertItems(at: page.indexPaths)
-            }
-        }
-        .disposed(by: bag)
+        viewModel.state
+            .observe(on: MainScheduler.asyncInstance)
+            .subscribe(onNext: { [weak self] state in
+                guard let self = self else {
+                    return
+                }
+                switch state {
+                case .finishedLoadingGenres:
+                    self.genresView.reloadData()
+                    self.viewModel.didSelect(genreAt: .zero)
+                case .genreChange(let oldIndex, let newIndex):
+                    var indexPaths: [IndexPath] = []
+                    if let newIndex = newIndex, self.viewModel.genres.count > newIndex {
+                        self.viewModel.loadPage(for: self.viewModel.genres[newIndex].id, page: 1)
+                        indexPaths.append(IndexPath(item: newIndex, section: .zero))
+                    }
+                    if let oldIndex = oldIndex, self.viewModel.genres.count > oldIndex {
+                        indexPaths.append(IndexPath(item: oldIndex, section: .zero))
+                    }
+                    UIView.performWithoutAnimation {
+                        self.genresView.reloadItems(at: indexPaths)
+                    }
+                case .empty:
+                    self.listView.reloadData()
+                case .loading: // TODO: add loading indicator here
+                    break
+                case .loaded(let page):
+                    self.listView.insertItems(at: page.indexPaths)
+                }
+            })
+            .disposed(by: bag)
     }
 }
 
@@ -117,7 +129,7 @@ extension ListViewController: UICollectionViewDataSource {
         if collectionView === listView {
             return viewModel.listCount
         } else {
-            return viewModel.genres.value.count
+            return viewModel.genres.count
         }
     }
     
@@ -136,7 +148,9 @@ extension ListViewController: UICollectionViewDataSource {
         ) as? GenresItemView else {
             return UICollectionViewCell()
         }
-        cell.configure(with: viewModel.genres.value[indexPath.row])
+        let genre = viewModel.genres[indexPath.row]
+        cell.isSelected = viewModel.isGenreSelected(at: indexPath.item)
+        cell.configure(with: genre)
         return cell
     }
     
@@ -156,6 +170,8 @@ extension ListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if collectionView === listView {
             viewModel.preloadIfNeeded(for: indexPath.item)
+        } else {
+            cell.isSelected = viewModel.isGenreSelected(at: indexPath.item)
         }
     }
 }
@@ -164,9 +180,9 @@ extension ListViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView === listView {
-            return CGSize(width: (collectionView.frame.width / 2.0) - Dimensions.sizeSM, height: 150.0)
+            return CGSize(width: (collectionView.frame.width / 2.0) - Dimensions.sizeXS, height: Constants.itemCellHeight)
         } else {
-            return CGSize(width: .max, height: .max)
+            return CGSize(width: Constants.estimatedGenreCellWidth, height: Dimensions.sizeXL)
         }
     }
 }
@@ -176,6 +192,8 @@ extension ListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView === genresView {
             viewModel.didSelect(genreAt: indexPath.item)
+            listView.setContentOffset(.zero, animated: true)
         }
     }
 }
+

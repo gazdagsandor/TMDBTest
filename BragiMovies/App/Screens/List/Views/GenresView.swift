@@ -15,7 +15,8 @@ class GenresView: UICollectionView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        layout.minimumInteritemSpacing = Dimensions.sizeM
+        layout.minimumInteritemSpacing = .zero
+        layout.minimumLineSpacing = .zero
         super.init(frame: .zero, collectionViewLayout: layout)
         
         setupUI()

@@ -12,7 +12,7 @@ class ListView: UICollectionView {
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumInteritemSpacing = Dimensions.sizeS
+        layout.minimumInteritemSpacing = Dimensions.sizeXXS
         layout.minimumLineSpacing = Dimensions.sizeS
         super.init(frame: .zero, collectionViewLayout: layout)
         
@@ -25,7 +25,7 @@ class ListView: UICollectionView {
     }
 
     func setupUI() {
-        backgroundColor = .white
+        backgroundColor = .lightGray.withAlphaComponent(0.5)
         showsHorizontalScrollIndicator = false
         register(ListItemView.self, forCellWithReuseIdentifier: ListItemView.identifier)
     }

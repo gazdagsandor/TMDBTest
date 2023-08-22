@@ -19,6 +19,16 @@ class GenresItemView: UICollectionViewCell {
         return label
     }()
     
+    override var isSelected: Bool {
+        didSet {
+            if isSelected {
+                backgroundColor = .lightGray
+            } else {
+                backgroundColor = .white
+            }
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -38,12 +48,11 @@ class GenresItemView: UICollectionViewCell {
         addSubview(title)
         
         NSLayoutConstraint.activate([
-            title.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            title.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            title.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            title.heightAnchor.constraint(equalToConstant: 40),
-            
-            title.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            title.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Dimensions.sizeS),
+            title.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: Dimensions.sizeS),
+            title.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -Dimensions.sizeS),
+            title.heightAnchor.constraint(equalToConstant: Dimensions.sizeXL),
+            title.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: Dimensions.sizeS),
         ])
     }
     
