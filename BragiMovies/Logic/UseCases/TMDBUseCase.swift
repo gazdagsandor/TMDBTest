@@ -20,7 +20,7 @@ protocol TMDBUseCaseProtocol {
 }
 
 class TMDBUseCase: TMDBUseCaseProtocol {
-
+    
     var tmdbRepository: TMDBRepositoryProtocol
     
     init(tmdbRepository: TMDBRepositoryProtocol) {
@@ -33,7 +33,28 @@ class TMDBUseCase: TMDBUseCaseProtocol {
     }
     
     func listMovies(for mediaType: MediaType, with genreID: Int, page: Int) -> Single<ListPage<Movie>> {
-        tmdbRepository.listMedia(for: mediaType, with: genreID, page: page)
+        let listPage: Observable<ListPage<Movie>> = tmdbRepository.listMedia(for: mediaType, with: genreID, page: page).asObservable()
+        return listPage
+            .flatMap({ page in
+                Observable.from(
+                page.results
+                    .compactMap { [weak self] movie in
+                        self?.movieDetails(for: mediaType, with: movie.id)
+                            .asObservable()
+                    }
+                )
+                .merge()
+                .toArray()
+                .map { (items: [Movie]) -> ListPage<Movie> in
+                    ListPage(
+                        page: page.page,
+                        results: items,
+                        totalPages: page.totalPages,
+                        totalResults: page.totalResults
+                    )
+                }
+            })
+            .asSingle()
     }
     
     func movieDetails(for mediaType: MediaType, with mediaID: Int) -> Single<Movie> {
@@ -41,7 +62,28 @@ class TMDBUseCase: TMDBUseCaseProtocol {
     }
     
     func listTVShows(for mediaType: MediaType, with genreID: Int, page: Int) -> Single<ListPage<TVShow>> {
-        tmdbRepository.listMedia(for: mediaType, with: genreID, page: page)
+        let listPage: Observable<ListPage<TVShow>> = tmdbRepository.listMedia(for: mediaType, with: genreID, page: page).asObservable()
+        return listPage
+            .flatMap({ page in
+                Observable.from(
+                    page.results
+                        .compactMap { [weak self] tvShow in
+                            self?.tvShowDetails(for: mediaType, with: tvShow.id)
+                                .asObservable()
+                        }
+                )
+                .merge()
+                .toArray()
+                .map { (items: [TVShow]) -> ListPage<TVShow> in
+                    ListPage(
+                        page: page.page,
+                        results: items,
+                        totalPages: page.totalPages,
+                        totalResults: page.totalResults
+                    )
+                }
+            })
+            .asSingle()
     }
     
     func tvShowDetails(for mediaType: MediaType, with mediaID: Int) -> Single<TVShow> {

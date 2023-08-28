@@ -94,7 +94,16 @@ class ListViewModel: ListViewModelProtocol {
             .listMovies(for: type, with: genreID, page: page)
         handle
             .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: handleResults)
+            .subscribe(onSuccess: { [weak self] page in
+                let page = Page(
+                    page: page.page,
+                    items: page.results.map { $0.toPageItem() },
+                    totalPages: page.totalPages,
+                    totalResults: page.totalResults
+                )
+                self?.pages.append(page)
+                self?.state.accept(.loaded(page: page))
+            })
             .disposed(by: bag)
     }
     
@@ -103,40 +112,17 @@ class ListViewModel: ListViewModelProtocol {
             .listTVShows(for: type, with: genreID, page: page)
         handle
             .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: handleResults)
-            .disposed(by: bag)
-    }
-    
-    private func handleResults<Item: PageItemConvertible>(page: ListPage<Item>) {
-        Observable.from(
-            page.results.map { (media: Item) -> Observable<PageItem> in
-                switch type {
-                case .movie:
-                    return tmdbUseCase.movieDetails(for: type, with: media.id)
-                        .asObservable()
-                        .map { $0.toPageItem() }
-                case .tv:
-                    return tmdbUseCase.tvShowDetails(for: type, with: media.id)
-                        .asObservable()
-                        .map { $0.toPageItem() }
-                }
+            .subscribe(onSuccess: { [weak self] page in
+                let page = Page(
+                    page: page.page,
+                    items: page.results.map { $0.toPageItem() },
+                    totalPages: page.totalPages,
+                    totalResults: page.totalResults
+                )
+                self?.pages.append(page)
+                self?.state.accept(.loaded(page: page))
             })
-        .merge()
-        .toArray()
-        .map({ (items: [PageItem]) -> Page in // NOTE: Sometimes type inference needs some help
-            Page(
-                page: page.page,
-                items: items,
-                totalPages: page.totalPages,
-                totalResults: page.totalResults
-            )
-        })
-        .observe(on: MainScheduler.instance)
-        .subscribe(onSuccess: { [weak self] page in
-            self?.pages.append(page)
-            self?.state.accept(.loaded(page: page))
-        })
-        .disposed(by: bag)
+            .disposed(by: bag)
     }
     
     func preloadIfNeeded(for index: Int) {
