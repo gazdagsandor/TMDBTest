@@ -7,28 +7,53 @@
 
 import Foundation
 
+typealias PageItemDataLine = (title: String, value: String?)
+
 struct PageItem {
+    
+    static var amountFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }()
+    
     var id: Int
-    var title: String
-    var voteAverage: String
-    var budget: String
-    var revenue: String
+    var lines: [PageItemDataLine] = []
     var imageURL: URL?
     
-    init(id: Int, title: String, voteAverage: Double, budget: Int?, revenue: Int?, imageURL: URL?) {
-        self.id = id
-        self.title = title
-        self.voteAverage = "\(voteAverage)"
-        if let budget = budget {
-            self.budget = "\(budget)"
-        } else {
-            self.budget = "-"
+    static func from(input: PageItemInput) -> PageItem {
+        switch input {
+        case .movie(let id, let title, let voteAverage, let budget, let revenue, let imageURL):
+            var item = PageItem(id: id, imageURL: imageURL)
+            item.lines.append(PageItemDataLine(title: "Title:", value: title))
+            item.lines.append(PageItemDataLine(title: "Rating:", value: "\(voteAverage)"))
+            if let budget = budget {
+                let b = amountFormatter.string(from: NSNumber(value: budget))
+                item.lines.append(PageItemDataLine(title: "Budget:", value: b))
+            } else {
+                item.lines.append(PageItemDataLine(title: "Budget:", value: "-"))
+            }
+            if let revenue = revenue {
+                item.lines.append(PageItemDataLine(title: "Revenue:", value: "\(revenue)"))
+            } else {
+                item.lines.append(PageItemDataLine(title: "Revenue:", value: "-"))
+            }
+            return item
+        case .tvShow(let id, let title, let voteAverage, let lastAirDate, let lastEpisodeToAir, let imageURL):
+            var item = PageItem(id: id, imageURL: imageURL)
+            item.lines.append(PageItemDataLine(title: "Title:", value: title))
+            item.lines.append(PageItemDataLine(title: "Rating:", value: "\(voteAverage)"))
+            if let lastAirDate = lastAirDate {
+                item.lines.append(PageItemDataLine(title: "Last aired:", value: lastAirDate))
+            } else {
+                item.lines.append(PageItemDataLine(title: "Last aired:", value: "-"))
+            }
+            if let lastEpisodeToAir = lastEpisodeToAir {
+                item.lines.append(PageItemDataLine(title: "Last ep:", value: lastEpisodeToAir))
+            } else {
+                item.lines.append(PageItemDataLine(title: "Last ep:", value: "-"))
+            }
+            return item
         }
-        if let revenue = revenue {
-            self.revenue = "\(revenue)"
-        } else {
-            self.revenue = "-"
-        }
-        self.imageURL = imageURL
     }
 }
