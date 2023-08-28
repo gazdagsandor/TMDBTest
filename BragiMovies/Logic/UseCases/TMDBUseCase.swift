@@ -8,10 +8,7 @@
 import Foundation
 import RxSwift
 
-typealias MediaIdentifiable = (Codable & Identifiable)
-
 protocol TMDBUseCaseProtocol {
-    
     func listGenres(for mediaType: MediaType) -> Single<[Genre]>
     func listMovies(for mediaType: MediaType, with genreID: Int, page: Int) -> Single<ListPage<Movie>>
     func movieDetails(for mediaType: MediaType, with mediaID: Int) -> Single<Movie>
@@ -35,11 +32,14 @@ class TMDBUseCase: TMDBUseCaseProtocol {
     func listMovies(for mediaType: MediaType, with genreID: Int, page: Int) -> Single<ListPage<Movie>> {
         let listPage: Observable<ListPage<Movie>> = tmdbRepository.listMedia(for: mediaType, with: genreID, page: page).asObservable()
         return listPage
-            .flatMap({ page in
-                Observable.from(
+            .flatMap({ [weak self] page in
+                guard let self = self else {
+                    return Observable<ListPage<Movie>>.empty().asSingle()
+                }
+                return Observable.from(
                 page.results
-                    .compactMap { [weak self] movie in
-                        self?.movieDetails(for: mediaType, with: movie.id)
+                    .compactMap { movie in
+                        self.movieDetails(for: mediaType, with: movie.id)
                             .asObservable()
                     }
                 )
@@ -64,11 +64,14 @@ class TMDBUseCase: TMDBUseCaseProtocol {
     func listTVShows(for mediaType: MediaType, with genreID: Int, page: Int) -> Single<ListPage<TVShow>> {
         let listPage: Observable<ListPage<TVShow>> = tmdbRepository.listMedia(for: mediaType, with: genreID, page: page).asObservable()
         return listPage
-            .flatMap({ page in
-                Observable.from(
+            .flatMap({ [weak self] page in
+                guard let self = self else {
+                    return Observable<ListPage<TVShow>>.empty().asSingle()
+                }
+                return Observable.from(
                     page.results
-                        .compactMap { [weak self] tvShow in
-                            self?.tvShowDetails(for: mediaType, with: tvShow.id)
+                        .compactMap { tvShow in
+                            self.tvShowDetails(for: mediaType, with: tvShow.id)
                                 .asObservable()
                         }
                 )

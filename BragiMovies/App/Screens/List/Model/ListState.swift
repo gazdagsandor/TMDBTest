@@ -8,7 +8,7 @@
 import Foundation
 
 enum ListState {
-    case empty
+    case initialized
     case finishedLoadingGenres
     case genreChange(from: Int?, to: Int?)
     case loading(page: Int)

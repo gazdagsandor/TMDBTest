@@ -37,7 +37,7 @@ class ListViewModel: ListViewModelProtocol {
     let type: MediaType
     let tmdbUseCase: TMDBUseCaseProtocol
     
-    let state: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .empty)
+    let state: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .initialized)
     
     var genres: [Genre] = []
     var selectedGenre: Int? = nil
@@ -165,7 +165,7 @@ class ListViewModel: ListViewModelProtocol {
     
     private func resetMediaList() {
         pages = []
-        state.accept(.empty)
+        state.accept(.initialized)
     }
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TVShow: Codable, Equatable, Identifiable {
+struct TVShow: Codable, Equatable {
     let id: Int
     let name: String
     let voteAverage: Double
