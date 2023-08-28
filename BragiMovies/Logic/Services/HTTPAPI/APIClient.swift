@@ -50,12 +50,7 @@ class APIClient: APIClientProtocol {
         
         return session.rx
             .response(request: urlRequest)
-            .do(onNext: { response, _ in
-                guard 200 ..< 499 ~= response.statusCode else {
-                    throw APIError.serverError(nil)
-                }
-            })
-                .mapObject(type: ResponseType.self)
-                .asSingle()
-                }
+            .mapObject(type: ResponseType.self)
+            .asSingle()
+    }
 }

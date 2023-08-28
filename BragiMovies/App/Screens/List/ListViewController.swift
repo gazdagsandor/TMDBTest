@@ -98,7 +98,7 @@ class ListViewController: UIViewController {
                 switch state {
                 case .finishedLoadingGenres:
                     self.genresView.reloadData()
-                    self.viewModel.didSelect(genreAt: .zero)
+                    self.viewModel.didSelect(genreAt: self.viewModel.selectedGenre ?? .zero)
                 case .genreChange(let oldIndex, let newIndex):
                     var indexPaths: [IndexPath] = []
                     if let newIndex = newIndex, self.viewModel.genres.count > newIndex {

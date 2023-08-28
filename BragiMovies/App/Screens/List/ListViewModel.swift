@@ -73,7 +73,7 @@ class ListViewModel: ListViewModelProtocol {
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] items in
                 self?.genres = items
-                self?.selectedGenre = .zero
+                self?.selectedGenre = self?.selectedGenre ?? .zero
                 self?.state.accept(.finishedLoadingGenres)
             })
             .disposed(by: bag)
