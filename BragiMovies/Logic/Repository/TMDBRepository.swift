@@ -28,12 +28,12 @@ class TMDBRepository: TMDBRepositoryProtocol {
     
     func listGenres(for mediaType: MediaType) -> Single<Genres> {
         let request = APIRequest(method: .get, path: "/genre/\(mediaType.rawValue)/list")
-        request.queryItems = [URLQueryItem(name: "language", value: "en")]
+        request.queryItems = [
+            URLQueryItem(name: "language", value: "en-US"),
+            URLQueryItem(name: "api_key", value: apiKey)
+        ]
         request.headers = [
-            HTTPHeader(
-                field: "Authorization:",
-                value: "Bearer " + apiKey
-            )
+            HTTPHeader(field: "Content-Type", value: "application/json")
         ]
         return apiClient.perform(request)
     }
@@ -44,14 +44,11 @@ class TMDBRepository: TMDBRepositoryProtocol {
             URLQueryItem(name: "language", value: "en"),
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "with_genres", value: "\(genreID)"),
-            URLQueryItem(name: "sort_by", value: "popularity.desc")
-
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "api_key", value: apiKey)
         ]
         request.headers = [
-            HTTPHeader(
-                field: "Authorization:",
-                value: "Bearer " + apiKey
-            )
+            HTTPHeader(field: "Content-Type", value: "application/json"),
         ]
         return apiClient.perform(request)
     }
@@ -60,16 +57,11 @@ class TMDBRepository: TMDBRepositoryProtocol {
         let request = APIRequest(method: .get, path: "/\(mediaType.rawValue)/\(mediaID)")
         request.queryItems = [
             URLQueryItem(name: "language", value: "en"),
-            URLQueryItem(name: "append_to_response", value: "discover"),
-
+            URLQueryItem(name: "api_key", value: apiKey)
         ]
         request.headers = [
-            HTTPHeader(
-                field: "Authorization:",
-                value: "Bearer " + apiKey
-            )
+            HTTPHeader(field: "Content-Type", value: "application/json"),
         ]
         return apiClient.perform(request)
     }
-    
 }

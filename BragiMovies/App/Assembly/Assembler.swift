@@ -25,7 +25,7 @@ extension Assembler {
     func tmdbUseCase() -> TMDBUseCaseProtocol {
         return TMDBUseCase(
             tmdbRepository: tmdbRepository(
-                apiKey: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ZjU0YWQxZWE0ZmI0YzVmMDczMjFjZDUyZDJmMzBlMCIsInN1YiI6IjU4OWNjNjg3YzNhMzY4MTE1ODAwMTc0MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-vWmnNb68dUwPtyzuGsQzszxj1nshCDJvMf0EBqOaZk"
+                apiKey: "7f54ad1ea4fb4c5f07321cd52d2f30e0"
             )
         )
     }

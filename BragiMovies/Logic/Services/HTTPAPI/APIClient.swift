@@ -55,14 +55,7 @@ class APIClient: APIClientProtocol {
                     throw APIError.serverError(nil)
                 }
             })
-            .map { [weak self] response, data in
-                guard let self = self else {
-                    throw APIError.notFound
+                .mapObject(type: ResponseType.self)
+                .asSingle()
                 }
-                return try self.decoder.decode(ResponseType.self, from: data)
-            }
-            .asSingle()
-    }
 }
-
-
