@@ -64,4 +64,9 @@ class ListItemDataView: UIView {
             value.widthAnchor.constraint(equalTo: title.widthAnchor, multiplier: Constants.valueTitleWidthRatio)
         ])
     }
+    
+    func configure(with line: PageItemDataLine) {
+        title.text = line.title
+        value.text = line.value
+    }
 }

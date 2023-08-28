@@ -111,7 +111,7 @@ class ListViewController: UIViewController {
                     UIView.performWithoutAnimation {
                         self.genresView.reloadItems(at: indexPaths)
                     }
-                case .empty:
+                case .initialized:
                     self.listView.reloadData()
                 case .loading: // TODO: add loading indicator here
                     break
@@ -196,4 +196,5 @@ extension ListViewController: UICollectionViewDelegate {
         }
     }
 }
+
 

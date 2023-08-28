@@ -20,33 +20,29 @@ class ListItemView: UICollectionViewCell {
         return imageView
     }()
     
-    lazy var title: ListItemDataView = {
+    lazy var line1: ListItemDataView = {
         let view = ListItemDataView()
-        view.title.text = "Title:"
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setContentCompressionResistancePriority(.init(rawValue: 1000), for: .vertical)
         return view
     }()
     
-    lazy var rating: ListItemDataView = {
+    lazy var line2: ListItemDataView = {
         let view = ListItemDataView()
-        view.title.text = "Rating:"
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setContentCompressionResistancePriority(.init(rawValue: 1000), for: .vertical)
         return view
     }()
 
-    lazy var budget: ListItemDataView = {
+    lazy var line3: ListItemDataView = {
         let view = ListItemDataView()
-        view.title.text = "Budget:"
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setContentCompressionResistancePriority(.init(rawValue: 1000), for: .vertical)
         return view
     }()
     
-    lazy var revenue: ListItemDataView = {
+    lazy var line4: ListItemDataView = {
         let view = ListItemDataView()
-        view.title.text = "Revenue:"
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setContentCompressionResistancePriority(.init(rawValue: 1000), for: .vertical)
         return view
@@ -55,7 +51,7 @@ class ListItemView: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
-        title.translatesAutoresizingMaskIntoConstraints = false
+        line1.translatesAutoresizingMaskIntoConstraints = false
         
         setupUI()
     }
@@ -72,10 +68,10 @@ class ListItemView: UICollectionViewCell {
         contentView.clipsToBounds = true
         addSubview(image)
 
-        addSubview(title)
-        addSubview(rating)
-        addSubview(budget)
-        addSubview(revenue)
+        addSubview(line1)
+        addSubview(line2)
+        addSubview(line3)
+        addSubview(line4)
 
         NSLayoutConstraint.activate([
             image.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Dimensions.sizeS),
@@ -83,29 +79,33 @@ class ListItemView: UICollectionViewCell {
             image.heightAnchor.constraint(equalTo: image.widthAnchor, multiplier: 0.5),
             image.centerXAnchor.constraint(equalTo: centerXAnchor),
 
-            title.topAnchor.constraint(greaterThanOrEqualTo: image.bottomAnchor, constant: Dimensions.sizeXS),
-            title.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            title.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            line1.topAnchor.constraint(greaterThanOrEqualTo: image.bottomAnchor, constant: Dimensions.sizeXS),
+            line1.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            line1.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            rating.topAnchor.constraint(greaterThanOrEqualTo: title.bottomAnchor, constant: Dimensions.sizeXS),
-            rating.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            rating.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            line2.topAnchor.constraint(greaterThanOrEqualTo: line1.bottomAnchor, constant: Dimensions.sizeXS),
+            line2.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            line2.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            budget.topAnchor.constraint(greaterThanOrEqualTo: rating.bottomAnchor, constant: Dimensions.sizeXS),
-            budget.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            budget.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            line3.topAnchor.constraint(greaterThanOrEqualTo: line2.bottomAnchor, constant: Dimensions.sizeXS),
+            line3.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            line3.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 
-            revenue.topAnchor.constraint(greaterThanOrEqualTo: budget.bottomAnchor, constant: Dimensions.sizeXS),
-            revenue.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            revenue.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            line4.topAnchor.constraint(greaterThanOrEqualTo: line3.bottomAnchor, constant: Dimensions.sizeXS),
+            line4.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            line4.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
         ])
     }
     
     func configure(with item: PageItem) {
-        title.value.text = item.title
-        rating.value.text = item.voteAverage
-        budget.value.text = item.budget
-        revenue.value.text = item.revenue
+        let lines = [line1, line2, line3, line4]
+        item.lines
+            .enumerated()
+            .forEach { lineData in
+                if lines.count > lineData.offset {
+                    lines[lineData.offset].configure(with: lineData.element)
+                }
+        }
         
         image.kf.setImage(
             with: item.imageURL,

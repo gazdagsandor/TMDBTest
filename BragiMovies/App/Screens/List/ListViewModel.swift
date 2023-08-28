@@ -15,12 +15,12 @@ protocol ListViewModelProtocol {
     
     var genres: [Genre] { get }
     var selectedGenre: Int? { get }
-
+    
     var listCount: Int { get }
     var list: [PageItem] { get }
-
+    
     var state: BehaviorRelay<ListState> { get }
-
+    
     func loadGenres()
     func didSelect(genreAt index: Int)
     func isGenreSelected(at index: Int) -> Bool
@@ -36,9 +36,9 @@ class ListViewModel: ListViewModelProtocol {
     let title: String
     let type: MediaType
     let tmdbUseCase: TMDBUseCaseProtocol
-
-    let state: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .empty)
-
+    
+    let state: BehaviorRelay<ListState> = BehaviorRelay<ListState>(value: .initialized)
+    
     var genres: [Genre] = []
     var selectedGenre: Int? = nil
     
@@ -55,11 +55,11 @@ class ListViewModel: ListViewModelProtocol {
         }
         return list
     }
-
+    
     private var bag = DisposeBag()
-
+    
     // MARK: -
-
+    
     init(type: MediaType, tmdbUseCase: TMDBUseCaseProtocol) {
         self.type = type
         self.title = type.rawValue
@@ -78,7 +78,7 @@ class ListViewModel: ListViewModelProtocol {
             })
             .disposed(by: bag)
     }
-
+    
     func loadPage(for genreID: Int, page: Int) {
         state.accept(.loading(page: page))
         switch type {
@@ -91,44 +91,34 @@ class ListViewModel: ListViewModelProtocol {
     
     private func loadMovies(for genreID: Int, page: Int) {
         let handle: Single<ListPage<Movie>> = tmdbUseCase
-            .listMedia(for: type, with: genreID, page: page)
+            .listMovies(for: type, with: genreID, page: page)
         handle
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] page in
-                self?.handleResults(page: page)
-            })
-            .disposed(by: bag)
-    }
-
-    private func loadTVShows(for genreID: Int, page: Int) {
-        let handle: Single<ListPage<TVShow>> = tmdbUseCase
-            .listMedia(for: type, with: genreID, page: page)
-        handle
-            .observe(on: MainScheduler.instance)
-            .subscribe(onSuccess: { [weak self] page in
-                self?.handleResults(page: page)
-            })
-            .disposed(by: bag)
-    }
-
-    private func handleResults<Item: PageItemConvertible>(page: ListPage<Item>) {
-        Observable.from(
-                page.results.map { media in
-                    tmdbUseCase.mediaDetails(for: type, with: media.id).asObservable()
-                }
-            )
-            .merge()
-            .toArray()
-            .map({ (items: [Item]) -> Page in // NOTE: Sometimes type inference needs some help
-                Page(
+                let page = Page(
                     page: page.page,
-                    items: items.map { $0.toPageItem() },
+                    items: page.results.map { $0.toPageItem() },
                     totalPages: page.totalPages,
                     totalResults: page.totalResults
                 )
+                self?.pages.append(page)
+                self?.state.accept(.loaded(page: page))
             })
+            .disposed(by: bag)
+    }
+    
+    private func loadTVShows(for genreID: Int, page: Int) {
+        let handle: Single<ListPage<TVShow>> = tmdbUseCase
+            .listTVShows(for: type, with: genreID, page: page)
+        handle
             .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] page in
+                let page = Page(
+                    page: page.page,
+                    items: page.results.map { $0.toPageItem() },
+                    totalPages: page.totalPages,
+                    totalResults: page.totalResults
+                )
                 self?.pages.append(page)
                 self?.state.accept(.loaded(page: page))
             })
@@ -175,6 +165,7 @@ class ListViewModel: ListViewModelProtocol {
     
     private func resetMediaList() {
         pages = []
-        state.accept(.empty)
+        state.accept(.initialized)
     }
 }
+

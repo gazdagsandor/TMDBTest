@@ -14,26 +14,30 @@ protocol PageItemConvertible: Codable {
 
 extension Movie: PageItemConvertible {
     func toPageItem() -> PageItem {
-        PageItem(
-            id: id,
-            title: title,
-            voteAverage: voteAverage,
-            budget: budget ?? .zero,
-            revenue: revenue ?? .zero,
-            imageURL: URL(string: "https://image.tmdb.org/t/p/w500" + (backdropPath ?? ""))
+        .from(
+            input: .movie(
+                id: id,
+                title: title,
+                voteAverage: voteAverage,
+                budget: budget,
+                revenue: revenue,
+                imageURL: URL(string: "https://image.tmdb.org/t/p/w500" + (backdropPath ?? "")))
         )
     }
 }
 
 extension TVShow: PageItemConvertible {
     func toPageItem() -> PageItem {
-        PageItem(
-            id: id,
-            title: name,
-            voteAverage: voteAverage,
-            budget: .zero,
-            revenue: .zero,
-            imageURL: URL(string: "https://image.tmdb.org/t/p/w500" + (backdropPath ?? ""))
+        .from(
+            input: .tvShow(
+                id: id,
+                title: name,
+                voteAverage: voteAverage,
+                lastAirDate: lastAirDate,
+                lastEpisodeToAir: lastEpisodeToAir?.name,
+                imageURL: URL(string: "https://image.tmdb.org/t/p/w500" + (backdropPath ?? "")))
         )
     }
 }
+
+
